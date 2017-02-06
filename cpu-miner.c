@@ -20,9 +20,6 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <time.h>
-#if !defined(_WIN64) && !defined(_WIN32)
-    #include <sys/mman.h>
-#endif
 #ifdef WIN32
 #include <winsock2.h>
 #include <windows.h>
@@ -42,6 +39,7 @@
 #include <curl/curl.h>
 #include "compat.h"
 #include "miner.h"
+#include "xmalloc.h"
 
 #define PROGRAM_NAME		"minerd"
 #define LP_SCANTIME		60
@@ -2432,24 +2430,22 @@ int main(int argc, char *argv[]) {
 
 	applog(LOG_INFO, "Using JSON-RPC 2.0");
 	size_t sz = WILD_KECCAK_SCRATCHPAD_BUFFSIZE;
-#if !defined(_WIN64) && !defined(_WIN32)
-	pscratchpad_buff = mmap(0, sz, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS |
-		MAP_HUGETLB | MAP_POPULATE, 0, 0);
-	if(MAP_FAILED == pscratchpad_buff)      
-	{
-		applog(LOG_INFO, "hugetlb not available");
+
+#if MINERD_WANT_MMAP
+    pscratchpad_buff = mmap(0, sz, PROT_READ | PROT_WRITE, MAP_PRIVATE |
+                            MAP_ANON | MINERD_MMAP_FLAGS, 0, 0);
+    if(MAP_FAILED == pscratchpad_buff) {
+        applog(LOG_INFO, "hugetlb not available, mmap failed: %s", strerror(errno));
+        pscratchpad_buff = NULL;
+    } else {
+        applog(LOG_INFO, "using hugetlb");
+    }
 #endif
-		pscratchpad_buff = malloc(sz);
-		if(!pscratchpad_buff)
-		{
-			applog(LOG_ERR, "scratchpad allocation failed");
-			return 1;
-		}
-#if !defined(_WIN64) && !defined(_WIN32)
-	} else {
-		applog(LOG_INFO, "using hugetlb");
-	}
-#endif        //try to load scratchpad from file 
+    if (pscratchpad_buff == NULL) {
+        pscratchpad_buff = xmalloc(sz);
+    }
+
+//try to load scratchpad from file 
 	if(!load_scratchpad_from_file(pscratchpad_local_cache))
 	{
 		if(!pscratchpad_url)

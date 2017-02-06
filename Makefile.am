@@ -6,6 +6,8 @@ else
 JANSSON_INCLUDES=
 endif
 
+ACLOCAL_AMFLAGS = -I .
+
 EXTRA_DIST	= example-cfg.json nomacro.pl
 
 SUBDIRS		= compat
@@ -23,12 +25,13 @@ minerd_SOURCES	= elist.h \
 		  gpu.c \
 		  cpu-miner.c \
 		  util.c \
-		  wildkeccak.c
+		  wildkeccak.c \
+                  xmalloc.c
 
-minerd_LDFLAGS	= $(PTHREAD_FLAGS) 
-minerd_LDADD	= @LIBCURL@ @JANSSON_LIBS@ @PTHREAD_LIBS@ @WS2_LIBS@ -lOpenCL
+minerd_LDFLAGS	= $(PTHREAD_FLAGS) -framework OpenCL
+minerd_LDADD	= @LIBCURL@ @JANSSON_LIBS@ @PTHREAD_LIBS@ @WS2_LIBS@
 minerd_CPPFLAGS = @LIBCURL_CPPFLAGS@
-minerd_CFLAGS   = -std=gnu11 -O3 -fPIC -flto 
+minerd_CFLAGS   = -std=gnu11 -O3 -fPIC -flto -I /System/Library/Frameworks/OpenCL.framework/Versions/A/Headers/
 #-march=native 
 
 if HAVE_WINDOWS

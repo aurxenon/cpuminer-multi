@@ -8,5 +8,6 @@ set -e
 aclocal
 autoheader
 automake --gnu --add-missing --copy
-autoconf
+#autoconf
+autoreconf -i
 

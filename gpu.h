@@ -7,7 +7,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
-#include <CL/cl.h>
+#include <cl.h>
 
 typedef struct {
 	cl_device_id device;

@@ -113,7 +113,8 @@ static inline int helper_ffs(int x)
  * set bit if value is nonzero. The last (most significant) bit is
  * at position 32.
  */
-static inline int fls(int x)
+//static inline int fls(int x)
+int fls(int x)
 {
 	int r;
 
