@@ -3,8 +3,6 @@
 
 #include "cpuminer-config.h"
 
-#include "gpu.h"
-
 #include <stdbool.h>
 #include <inttypes.h>
 #include <sys/time.h>
@@ -222,7 +220,6 @@ struct thr_info {
     int		id;
     pthread_t	pth;
     struct thread_q	*q;
-	GPU*		gpu;
 	uint32_t shares_accepted;
 	uint32_t shares_rejected;
 };
@@ -254,7 +251,7 @@ extern struct work_restart *work_restart;
 extern bool jsonrpc_2;
 extern char rpc2_id[65];
 
-#define WILD_KECCAK_SCRATCHPAD_BUFFSIZE  (64<<22)
+#define WILD_KECCAK_SCRATCHPAD_BUFFSIZE  (64<<24)
 struct  __attribute__((__packed__)) scratchpad_hi
 {
     unsigned char prevhash[32];

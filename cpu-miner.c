@@ -202,10 +202,6 @@ static char const usage[] =
     Options:\n\
     -a, --algo=ALGO       specify the algorithm to use\n\
     wildkeccak   WildKeccak CPU\n\
-    wildkeccak_ocl   WildKeccak OpenCL\n\
-    wildkeccak_ocl_multistep   WildKeccak OpenCL multistep\n\
-    -d  --device=N  start OpenCL device to use (default: 0) \n\
-    -i  --intensity=N  OpenCL work intensity (default: 18) \n\
     -k  --scratchpad=URL  URL of inital scratchpad file\n\
     -l  --scratchpad_local_cache=PATH  PATH to local scratchpad file\n\
     -o, --url=URL         URL of mining server\n\
@@ -463,10 +459,7 @@ void reset_scratchpad(void)
 
 void update_scratchpad(void)
 {
-	if (opt_algo == ALGO_WILD_KECCAK_OCL || opt_algo == ALGO_WILD_KECCAK_OCL_MULTISTEP) {
-		for (int i = 0; i < opt_n_threads; i++)
-			thr_info[i].gpu->update_scratchpad = true;
-	}
+	
 }
 
 bool patch_scratchpad_with_addendum(uint64_t global_add_startpoint, uint64_t* padd_buff, size_t count/*uint64 units*/)
@@ -1486,10 +1479,7 @@ static void *miner_thread(void *userdata) {
 
         /* scan nonces for a proof-of-work hash */
         uint64_t start_nonce = *nonceptr;
-        if (opt_algo == ALGO_WILD_KECCAK)
-        	rc = scanhash_wildkeccak(thr_id, work.data, work.target, max_nonce, &hashes_done);
-        else
-        	rc = scanhash_wildkeccak_gpu(thr_id, mythr->gpu, work.data, work.target, max_nonce, &hashes_done);
+        rc = scanhash_wildkeccak(thr_id, work.data, work.target, max_nonce, &hashes_done);
 
         /* record scanhash elapsed time */
         gettimeofday(&tv_end, NULL );
@@ -2066,7 +2056,7 @@ static void parse_arg(int key, char *arg) {
     switch (key) {
     case 'd':
         v = atoi(arg);
-        if (v < 0 || v >= MAX_GPU) /* sanity check */
+        if (v < 0 || v >= 8) /* sanity check */
             show_usage_and_exit(1);
         opt_device = v;
         break;
@@ -2520,10 +2510,7 @@ int main(int argc, char *argv[]) {
     if (num_processors < 1)
         num_processors = 1;
     if (!opt_n_threads)
-    	if (opt_algo == ALGO_WILD_KECCAK_OCL || opt_algo == ALGO_WILD_KECCAK_OCL_MULTISTEP)
-    		opt_n_threads = MAX_GPU;
-    	else
-    		opt_n_threads = num_processors;
+        opt_n_threads = num_processors;
 
 #ifdef HAVE_SYSLOG_H
     if (use_syslog)
@@ -2541,18 +2528,6 @@ int main(int argc, char *argv[]) {
     thr_hashrates = (double *) calloc(opt_n_threads, sizeof(double));
     if (!thr_hashrates)
         return 1;
-
-	if (opt_algo == ALGO_WILD_KECCAK_OCL || opt_algo == ALGO_WILD_KECCAK_OCL_MULTISTEP) {
-	    for (i = 0; i < opt_n_threads; i++) {
-	        thr = &thr_info[i];
-
-			thr->gpu = initGPU(i + opt_device, opt_algo == ALGO_WILD_KECCAK_OCL ? 0 : 1);
-			if (thr->gpu == NULL)
-				break;
-	    }
-
-    	opt_n_threads = i;
-	}
 
     /* init workio thread info */
     work_thr_id = opt_n_threads;
