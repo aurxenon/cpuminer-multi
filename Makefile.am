@@ -21,8 +21,6 @@ dist_man_MANS	= minerd.1
 minerd_SOURCES	= elist.h \
 		  miner.h \
 		  compat.h \
-		  gpu.h \
-		  gpu.c \
 		  cpu-miner.c \
 		  util.c \
 		  wildkeccak.c \
