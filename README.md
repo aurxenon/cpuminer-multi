@@ -1,15 +1,15 @@
-**THIS ONLY RUNS ON THE PROCESSOR**
+**THIS ONLY RUNS ON THE CPU**
 
 
 Purpose
 =======
-This repo is a fork of [xbbricker's](cpuminer-multi-opencl) multi-threaded macOS OpenCL/CPU miner for Boolberry, with modifications to compile/run on macOS computers that don't support OpenCL (i.e. Mac mini's or MacBook Air's). 
+This repo is a fork of [xbbricker's](cpuminer-multi-opencl) multi-threaded macOS OpenCL/CPU miner for Boolberry, with modifications to compile/run on computers that don't support OpenCL. 
 
 
-Build (macOS)
+Build
 =====
 ```sh
-git clone https://github.com/aurxenon/cpuminer-multi-macos
+git clone https://github.com/aurxenon/cpuminer-multi
 cd cpuminer-multi-opencl
 ./autogen.sh
 CFLAGS="-march=native" ./configure
@@ -24,7 +24,7 @@ Always specify local scratchpad file (ex. -l scratchpad.bin)!
 
 To mine:
 ```
-minerd -a wildkeccak -o stratum+tcp://url_to_server:7777 -u 1Gb8Hqg7VLWb5CTCynp258V2TpwQZAwZGZaxW3EoJ6aYSf5WVwCTtNeAWQ4cAgkaGnCujWs7b7Pin6kfHsXNkkWYUqJ8H7g -p X -l scratchpad.bin -k http://url_to_server/download/scratchpad.bin
+minerd -a wildkeccak -o stratum+tcp://url_to_server:7777 -u boolberry wallet address -p X -l scratchpad.bin -k http://url_to_server/download/scratchpad.bin
 ```
 
 Run "minerd --help" to see all options.
@@ -56,7 +56,7 @@ aurxenon accepts donations at
 
 Credits
 =======
-CPUMiner-Multi-macOS was forked from xbbricker's cpuminer-multi-opencl, and has been developed by aurxenon.
+cpuminer-multi was forked from xbbricker's cpuminer-multi-opencl, and has been developed by aurxenon.
 
 License
 =======
